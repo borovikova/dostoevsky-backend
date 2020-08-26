@@ -25,6 +25,10 @@
 ```
 
 Все данные за все года отдаются по `GET`-запросу на `/api/data/`. Например, `http://localhost:8000/api/data/`
+Токен должен быть в headers запроса:
+
+`Authorization: Token <token>`
+
 Пример ответа:
 
 ```
