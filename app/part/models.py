@@ -2,8 +2,6 @@ import re
 
 from django.db import models
 
-import constants
-
 
 class Part(models.Model):
     part = models.CharField(

@@ -19,11 +19,13 @@ services:
       - DB_USER=postgres
       - DB_PASS=supersecretpassword
       - DJANGO_SECRET_KEY=supersecretpassword
+      - ALLOWED_HOSTS='localhost'
+      - DJANGO_DEBUG=1
     depends_on:
       - db
 
   db:
-    image: postgres:10-alpine
+    image: postgres:12
     environment:
       - POSTGRES_DB=app
       - POSTGRES_USER=postgres
