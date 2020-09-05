@@ -57,7 +57,5 @@
 TODO:
 
 - README
-- swagger
 - linters
-- env variables
 - reduce docker image

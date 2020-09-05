@@ -5,6 +5,5 @@ from .serializers import AuthTokenSerializer
 
 
 class CreateTokenView(ObtainAuthToken):
-    """Create a new auth token for user"""
+    """Принимает имя пользователя и пароль, возвращает токен для доступа к основному API """
     serializer_class = AuthTokenSerializer
-    # renderer_classes = api_settings.DEFAULT_RENDERER_CLASSES
