@@ -7,13 +7,13 @@ from drf_yasg import openapi
 from . import views
 
 schema_view = get_schema_view(
-   openapi.Info(
-      title="Dostoevsky API",
-      default_version='v1',
-      description="Доступ к данным для проекта Достоевский",
-   ),
-   public=True,
-   permission_classes=(permissions.AllowAny,),
+    openapi.Info(
+        title="Dostoevsky API",
+        default_version='v1',
+        description="Доступ к данным для проекта Достоевский",
+    ),
+    public=True,
+    permission_classes=(permissions.AllowAny,),
 )
 
 urlpatterns = [

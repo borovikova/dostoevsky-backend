@@ -53,9 +53,4 @@
 ]
 ```
 
-
-TODO:
-
-- README
-- linters
-- reduce docker image
+Описание работы api также доступно по `/swagger/`

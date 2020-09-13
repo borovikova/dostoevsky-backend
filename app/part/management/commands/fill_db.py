@@ -7,6 +7,7 @@ from django.conf import settings
 
 from part.models import Part
 
+
 class Command(BaseCommand):
 
     def add_arguments(self, parser):
