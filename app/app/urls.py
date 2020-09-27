@@ -1,6 +1,5 @@
 from django.contrib import admin
 from django.urls import path, re_path, include
-from rest_framework import permissions
 
 from django.views.generic import TemplateView
 
