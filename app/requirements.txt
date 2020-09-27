@@ -4,6 +4,6 @@ psycopg2-binary==2.8.5
 pandas==1.0.3
 natsort==7.0.1
 gunicorn>=20.0.4,<20.1
-drf-yasg>=1.17.1,<2.0
+# drf-yasg>=1.17.1,<2.0
 
 flake8==3.8.3
