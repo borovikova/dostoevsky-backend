@@ -36,8 +36,8 @@ class Command(BaseCommand):
             parts = set(df[(df['year'] == year)].part.values.tolist())
             for part in parts:
                 parameters = df[(df['year'] == year) & (df['part'] == part)]
-                year = pd.Series(parameters.iloc[0, ]).year
-                name = pd.Series(parameters.iloc[0, ])['name']
+                year = pd.Series(parameters.iloc[0,]).year
+                name = pd.Series(parameters.iloc[0,])['name']
                 category = categories.get(part, {}).get('category', None)
                 params = {}
                 for index, row in parameters.iterrows():
