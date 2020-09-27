@@ -7,3 +7,11 @@ gunicorn>=20.0.4,<20.1
 # drf-yasg>=1.17.1,<2.0
 
 flake8==3.8.3
+
+django-extensions
+django-redis
+djangorestframework
+pyyaml
+uritemplate
+user-agent
+django-cors-headers
