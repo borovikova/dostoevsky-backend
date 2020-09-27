@@ -10,7 +10,6 @@ flake8==3.8.3
 
 django-extensions
 django-redis
-djangorestframework
 pyyaml
 uritemplate
 user-agent
