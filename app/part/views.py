@@ -7,7 +7,7 @@ from rest_framework import viewsets, mixins
 from .models import Part
 from part import serializers
 
-
+# @swagger_auto_schema(method='get', auto_schema=None)
 class PartViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
     """Не принимает никаких параметров, возвращает все имеющиеся в базе данные одним ответом.
     В Headers запроса должен быть токен `Authorization: Token <token>`"""

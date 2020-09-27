@@ -60,7 +60,7 @@ ROOT_URLCONF = 'app.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -72,6 +72,8 @@ TEMPLATES = [
         },
     },
 ]
+
+print(TEMPLATES)
 
 WSGI_APPLICATION = 'app.wsgi.application'
 
@@ -125,3 +127,18 @@ USE_TZ = True
 PROJECT_ROOT = os.path.dirname(__file__)
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(PROJECT_ROOT, 'static')
+
+# SWAGGER_SETTINGS = {
+#     'SECURITY_DEFINITIONS': {
+#         'DRF Token': {
+#             'type': 'apiKey',
+#             'name': 'Authorization',
+#             'in': 'header'
+#         }
+#     }
+# }
+
+# DEFAULT_API_URL='localhost:1337'
+
+# LOGIN_URL='/admin/login/?next=/'
+
