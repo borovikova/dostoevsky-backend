@@ -4,7 +4,10 @@ services:
   web:
     build:
       context: ./app
-    command: python manage.py runserver 0.0.0.0:8000
+    restart: on-failure
+    command: gunicorn app.wsgi:application --bind 0.0.0.0:8000
+    volumes:
+      - static_volume:/home/app/web/app/static
     environment:
       - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
       - ALLOWED_HOSTS=${ALLOWED_HOSTS}
@@ -12,69 +15,42 @@ services:
       - POSTGRES_DB=app
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASS}
-    ports:
-      - 8000:8000
+    expose:
+        - 8000
     env_file:
       - ./.env
     depends_on:
       - db
   db:
-    image: postgres:12.0-alpine
+    image: postgres:12.0
+    restart: always
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     environment:
       - POSTGRES_DB=app
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASS}
+  nginx:
+    build: ./nginx
+    restart: unless-stopped
+    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+    volumes:
+      - static_volume:/home/app/web/app/static
+      - ./nginx:/etc/nginx/conf.d
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - web
+  certbot:
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+    image: certbot/certbot
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
 
 volumes:
   postgres_data:
-
-# version: "3"
-
-# services:
-#   app:
-#     restart: always
-#     build:
-#       context: .
-#     ports:
-#       - "8000:8000"
-#     volumes:
-#       - ./app:/app
-#     command: >
-#       sh -c "python manage.py wait_for_db &&
-#              python manage.py makemigrations &&
-#              python manage.py migrate &&
-#              python manage.py collectstatic --noinput &&
-#              python manage.py runserver 0.0.0.0:8000"
-#     environment:
-#       - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
-#       - ALLOWED_HOSTS=${ALLOWED_HOSTS}
-#       - DJANGO_DEBUG=${DJANGO_DEBUG}
-#       - POSTGRES_DB=app
-#       - POSTGRES_USER=${DB_USER}
-#       - POSTGRES_PASSWORD=${DB_PASS}
-
-#     depends_on:
-#       - db
-
-#   db:
-#     image: postgres:12
-#     environment:
-#       - POSTGRES_DB=app
-#       - POSTGRES_USER=${DB_USER}
-#       - POSTGRES_PASSWORD=${DB_PASS}
-#     volumes:
-#       - postgres_data:/var/lib/postgresql/data/
-  
-#   nginx:
-#     image: nginx:latest
-#     ports:
-#       - 80:8080
-#     volumes:
-#       - ./webserver/nginx-proxy.conf:/etc/nginx/conf.d
-#     depends_on:
-#       - app
-      
-# volumes:
-#   postgres_data:
+  static_volume:
