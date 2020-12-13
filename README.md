@@ -3,11 +3,11 @@
 Запустить сервер в докере, провести миграции, собрать статику, создать суперюзера и заполнить базу:
 
 ```
-docker-compose -f docker-compose.prod.yml up -d --build
-docker-compose -f docker-compose.prod.yml exec web python manage.py migrate --noinput
-docker-compose -f docker-compose.prod.yml exec web python manage.py collectstatic --no-input --clear
-docker-compose -f docker-compose.prod.yml exec web python manage.py createsuperuser
-docker-compose -f docker-compose.prod.yml exec web python manage.py fill_db
+docker-compose up -d --build
+docker-compose exec web python manage.py migrate --noinput
+docker-compose exec web python manage.py collectstatic --no-input --clear
+docker-compose exec web python manage.py createsuperuser
+docker-compose exec web python manage.py fill_db
 ```
 
 Получить токен для доступа к api:
