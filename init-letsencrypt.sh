@@ -7,7 +7,7 @@ fi
 
 domains=(api.dostoevsky.io)
 rsa_key_size=4096
-data_path="./data/certbot"
+data_path="./certbot"
 email="ekaterina.borovikova@ovdinfo.org" # Adding a valid address is strongly recommended
 staging=1 # Set to 1 if you're testing your setup to avoid hitting request limits
 
