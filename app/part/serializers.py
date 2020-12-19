@@ -16,3 +16,4 @@ class PartSerializer(serializers.ModelSerializer):
     class Meta:
         model = Part
         fields = '__all__'
+
