@@ -2,6 +2,10 @@ import re
 import pandas as pd
 import datetime
 
+from django.db.models import IntegerField, Sum
+from django.db.models.functions import Cast
+from django.db.models.fields.json import KeyTransform
+
 from rest_framework import generics, authentication, permissions
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
@@ -32,6 +36,7 @@ class FiltersViewSet(viewsets.GenericViewSet):
         return re.search(r'(\d{3}(\.\d{1}|))', part).group()
     
     def list(self, request, *args, **kwargs): 
+        # TODO: переписать на работу с базой
         df = pd.DataFrame(Part.objects.order_by('part').values())
         
         parts = df.drop_duplicates(subset=['part'])['part'].values.tolist()
@@ -52,15 +57,16 @@ class FiltersViewSet(viewsets.GenericViewSet):
         }
         return response.Response(data)
 
+
 class AggregatedDataViewSet(viewsets.GenericViewSet):
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
     queryset = Part.objects.all()
-    filterset_fields = ['part', 'year']
+    uncountable = ["addTotalPersons","addTotalOffences","addAcquittalPersons","addAcquittalOffences","addDismissalPersons","addDismissalOffences","addDismissalOtherPersons","addDismissalOtherOffences","addUnfitToPleadPersons","addUnfitToPleadOffences"]
 
-    def get_queryset(self):
+    def filter_queryset(self):
         filters = {}
-        
+
         year = self.request.query_params.get('year')
         if year:
             filters['year__in'] = year.split(',')
@@ -71,7 +77,50 @@ class AggregatedDataViewSet(viewsets.GenericViewSet):
 
         category = self.request.query_params.get('category')
         if category:
-            filters['category__in'] = category.split(',') if category else None
+            filters['category__in'] = category.split(',')
 
         qs = self.queryset.filter(**filters)
         return qs
+    
+    def annotate_queryset(self, qs, parameters, breakdowns):
+        # TODO: перенести в метод qs менеджера
+        annotations = dict(
+            zip(
+                [f'{p}_' for p in parameters], 
+                map(lambda x: Cast(KeyTextTransform(x, "parameters"), IntegerField()), parameters)
+                )
+            )
+        qs = qs.annotate(**annotations)
+
+        annotations = dict(
+            zip(
+                parameters,
+                [Sum(f'{p}_') for p in parameters]
+            )
+        )
+        qs = qs.values(*breakdowns).annotate(**annotations).order_by()
+        return qs
+
+    def list(self, request, *args, **kwargs):
+        # print(set(self.get_queryset().values_list('year', flat=True)))
+
+        qs = self.filter_queryset()
+
+        params = self.request.query_params.get('param')
+        if params:
+            params = params.split(',')
+            params = [p for p in params if p not in self.uncountable]
+
+        breakdowns = self.request.query_params.get('breakdowns')
+        if breakdowns:
+            breakdowns = breakdowns.split(',')
+
+        qs = self.annotate_queryset(qs, params, breakdowns)
+
+        print(qs)
+        # TODO: вернуть None для неисчисляемых
+        return response.Response([])
+
+
+
+
