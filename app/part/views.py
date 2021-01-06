@@ -11,6 +11,7 @@ from rest_framework import viewsets, mixins, response, views
 from .models import Part
 from .serializers import PartSerializer
 
+
 class PartViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
     """Не принимает никаких параметров, возвращает все имеющиеся в базе данные одним ответом.
     В Headers запроса должен быть токен `Authorization: Token <token>`"""
@@ -30,16 +31,16 @@ class FiltersViewSet(viewsets.GenericViewSet):
         if re.search(r'[Вв]оинск', part):
             return "Воинские преступления"
         return re.search(r'(\d{3}(\.\d{1}|))', part).group()
-    
-    def list(self, request, *args, **kwargs): 
+
+    def list(self, request, *args, **kwargs):
         # TODO: переписать на работу с базой
         df = pd.DataFrame(Part.objects.order_by('part').values())
-        
+
         parts = df.drop_duplicates(subset=['part'])['part'].values.tolist()
         clauses = sorted(list(set([self.get_clause(part) for part in parts])))
         years = df.drop_duplicates(subset=['year'])['year'].values.tolist()
         categories = df.drop_duplicates(subset=['category']).dropna()['category'].values.tolist()
-        
+
         df.loc[:, 'params'] = df.apply(lambda row: list(row.parameters.keys()), axis=1)
         df = df.explode('params')
         params = sorted(df.drop_duplicates(subset=['params'])['params'].values.tolist())
@@ -58,7 +59,9 @@ class AggregatedDataViewSet(viewsets.GenericViewSet):
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
     queryset = Part.objects.all()
-    uncountable = ["addTotalPersons","addTotalOffences","addAcquittalPersons","addAcquittalOffences","addDismissalPersons","addDismissalOffences","addDismissalOtherPersons","addDismissalOtherOffences","addUnfitToPleadPersons","addUnfitToPleadOffences"]
+    uncountable = ["addTotalPersons", "addTotalOffences", "addAcquittalPersons", "addAcquittalOffences",
+                   "addDismissalPersons", "addDismissalOffences", "addDismissalOtherPersons",
+                   "addDismissalOtherOffences", "addUnfitToPleadPersons", "addUnfitToPleadOffences"]
 
     def list(self, request, *args, **kwargs):
 
@@ -69,11 +72,11 @@ class AggregatedDataViewSet(viewsets.GenericViewSet):
         part = self.request.query_params.get('part')
         if part:
             part = part.split(',')
-        
+
         category = self.request.query_params.get('category')
         if category:
             category = category.split(',')
-        
+
         params = self.request.query_params.get('param')
         params = params.split(',') if params else []
         countable_params = [p for p in params if p not in self.uncountable]
@@ -86,7 +89,7 @@ class AggregatedDataViewSet(viewsets.GenericViewSet):
         }
         groupby = [grouby_params[_] for _ in breakdowns if _ in grouby_params.keys()]
         qs = self.queryset.filter_and_aggregate(year, part, category, countable_params, groupby)
-        
+
         if not breakdowns:
             qs = qs.values('part', 'name', 'year', 'category', 'parameters')
 
@@ -95,6 +98,7 @@ class AggregatedDataViewSet(viewsets.GenericViewSet):
         def add_uncountable_params(row):
             row.update({param: None for param in params if param in self.uncountable})
             return row
+
         data = list(map(add_uncountable_params, data))
 
         return response.Response(data)

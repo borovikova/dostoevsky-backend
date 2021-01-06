@@ -4,6 +4,7 @@ from django.db import models
 from django.db.models.functions import Cast
 from django.db.models.fields.json import KeyTextTransform
 
+
 class AggregatedDataQuerySet(models.QuerySet):
     def filter_and_aggregate(self, year=None, part=None, category=None, parameters=[], groupby=[]):
         filters = {}
@@ -17,10 +18,10 @@ class AggregatedDataQuerySet(models.QuerySet):
 
         annotations = dict(
             zip(
-                [f'{p}_' for p in parameters], 
+                [f'{p}_' for p in parameters],
                 map(lambda x: Cast(KeyTextTransform(x, "parameters"), models.IntegerField()), parameters)
-                )
             )
+        )
         qs = qs.annotate(**annotations)
         annotations = dict(
             zip(
@@ -30,7 +31,6 @@ class AggregatedDataQuerySet(models.QuerySet):
         )
         qs = qs.values(*groupby).annotate(**annotations).order_by()
         return qs
-
 
 
 class Part(models.Model):
