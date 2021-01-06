@@ -88,17 +88,31 @@ class AggregatedDataViewSet(viewsets.GenericViewSet):
             'part': 'year'
         }
         groupby = [grouby_params[_] for _ in breakdowns if _ in grouby_params.keys()]
+
         qs = self.queryset.filter_and_aggregate(year, part, category, countable_params, groupby)
 
-        if not breakdowns:
-            qs = qs.values('part', 'name', 'year', 'category', 'parameters')
+        if len(breakdowns)==2:
+            qs = qs.values('part', 'name', 'year', 'parameters')
 
-        data = list(qs)
+        data = list(qs) if breakdowns else [qs]
 
-        def add_uncountable_params(row):
-            row.update({param: None for param in params if param in self.uncountable})
+        def add_unaggregated_params(row):
+            if part and 'year' not in breakdowns:
+                row['part'] = ', '.join(sorted(part))
+            if year and 'part' not in breakdowns:
+                if len(year) > 1:
+                    years = [int(_) for _ in year]
+                    row['year'] = '-'.join([str(min(years)), str(max(years))])
+                else:
+                    row['year'] = year[0]
+            if len(breakdowns) != 2:
+                row.update({param: None for param in params if param in self.uncountable})
+                row.update({'name': None})
+            else:
+                row.update({param:row.get('parameters', {}).get(param) for param in params})
+                row.pop('parameters')
             return row
 
-        data = list(map(add_uncountable_params, data))
+        data = list(map(add_unaggregated_params, data))
 
         return response.Response(data)

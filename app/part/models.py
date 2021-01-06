@@ -29,8 +29,10 @@ class AggregatedDataQuerySet(models.QuerySet):
                 [models.Sum(f'{p}_') for p in parameters]
             )
         )
-        qs = qs.values(*groupby).annotate(**annotations).order_by()
-        return qs
+        if not groupby:
+            return qs.aggregate(**annotations)
+
+        return qs.values(*groupby).order_by().annotate(**annotations)
 
 
 class Part(models.Model):
