@@ -63,7 +63,7 @@ class AggregatedDataView(generics.ListAPIView):
 
         countable_params = [p for p in params if p not in UNCOUNTABLE]
         groupby = breakdowns
-        if 'part' in breakdowns:
+        if 'part' in breakdowns or len(part) == 1:
             groupby.append('name')
 
         return Part.objects.filter_and_aggregate(year, part, category, countable_params, groupby)
