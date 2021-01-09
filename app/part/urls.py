@@ -1,12 +1,16 @@
-from django.urls import path
+from django.conf.urls import url
 from rest_framework.routers import DefaultRouter
 
 from part import views
 
 app_name = 'part'
 
+urlpatterns = [
+    url(r'aggregated_data', views.AggregatedDataView.as_view()),
+]
+
 router = DefaultRouter()
 router.register(r'data', views.PartViewSet, basename='data')
 router.register(r'filters', views.FiltersViewSet, basename='filters')
-router.register(r'aggregated_data', views.AggregatedDataViewSet, basename='aggregated_data')
-urlpatterns = router.urls
+
+urlpatterns += router.urls

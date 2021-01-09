@@ -6,7 +6,7 @@ from django.db.models.fields.json import KeyTextTransform
 
 
 class AggregatedDataQuerySet(models.QuerySet):
-    def filter_and_aggregate(self, year=None, part=None, category=None, parameters=[], groupby=[]):
+    def filter_and_aggregate(self, year=None, part=None, category=None, parameters=None, groupby=None):
         filters = {}
         if year:
             filters['year__in'] = year
@@ -16,23 +16,23 @@ class AggregatedDataQuerySet(models.QuerySet):
             filters['category__in'] = category
         qs = self.filter(**filters)
 
-        annotations = dict(
-            zip(
-                [f'{p}_' for p in parameters],
-                map(lambda x: Cast(KeyTextTransform(x, "parameters"), models.IntegerField()), parameters)
+        if parameters:
+            annotations = dict(
+                zip(
+                    [f'{p}_' for p in parameters],
+                    map(lambda x: Cast(KeyTextTransform(x, "parameters"), models.IntegerField()), parameters)
+                )
             )
-        )
-        qs = qs.annotate(**annotations)
-        annotations = dict(
-            zip(
-                parameters,
-                [models.Sum(f'{p}_') for p in parameters]
+            qs = qs.annotate(**annotations)
+            annotations = dict(
+                zip(
+                    parameters,
+                    [models.Sum(f'{p}_') for p in parameters]
+                )
             )
-        )
-        if not groupby:
-            return qs.aggregate(**annotations)
-
-        return qs.values(*groupby).order_by().annotate(**annotations)
+            if not groupby:
+                return qs.aggregate(**annotations)
+            return qs.values(*groupby).order_by().annotate(**annotations)
 
 
 class Part(models.Model):

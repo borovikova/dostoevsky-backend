@@ -1,15 +1,14 @@
-import json
 import re
 import pandas as pd
 
-from rest_framework import generics, authentication, permissions
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.settings import api_settings
-from rest_framework import viewsets, mixins, response, views
+from rest_framework import viewsets, mixins, views, generics, response
 
 from .models import Part
-from .serializers import PartSerializer
+from .serializers import PartSerializer, AggregatedDataSerializer, TablePartSerializer
+from .utils import prepare_query_params, add_filters_to_response
+from app.constants import UNCOUNTABLE
 
 
 class PartViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
@@ -55,64 +54,39 @@ class FiltersViewSet(viewsets.GenericViewSet):
         return response.Response(data)
 
 
-class AggregatedDataViewSet(viewsets.GenericViewSet):
+class AggregatedDataView(generics.ListAPIView):
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
-    queryset = Part.objects.all()
-    uncountable = ["addTotalPersons", "addTotalOffences", "addAcquittalPersons", "addAcquittalOffences",
-                   "addDismissalPersons", "addDismissalOffences", "addDismissalOtherPersons",
-                   "addDismissalOtherOffences", "addUnfitToPleadPersons", "addUnfitToPleadOffences"]
+
+    def get_queryset(self):
+        year, part, category, params, breakdowns = prepare_query_params(self.request.query_params)
+
+        countable_params = [p for p in params if p not in UNCOUNTABLE]
+        groupby = breakdowns
+        if 'part' in breakdowns:
+            groupby.append('name')
+
+        return Part.objects.filter_and_aggregate(year, part, category, countable_params, groupby)
 
     def list(self, request, *args, **kwargs):
+        year, part, category, params, breakdowns = prepare_query_params(request.query_params)
 
-        year = self.request.query_params.get('year')
-        if year:
-            year = year.split(',')
+        if len(breakdowns) == 1:
+            data = AggregatedDataSerializer(self.get_queryset(), many=True, context={'request': request}).data
 
-        part = self.request.query_params.get('part')
-        if part:
-            part = part.split(',')
+        if len(breakdowns) == 2:
+            filters = {}
+            if year:
+                filters['year__in'] = year
+            if part:
+                filters['part__in'] = part
+            if category:
+                filters['category__in'] = category
+            qs = Part.objects.filter(**filters)
+            data = TablePartSerializer(qs, many=True, context={'request': request}).data
 
-        category = self.request.query_params.get('category')
-        if category:
-            category = category.split(',')
-
-        params = self.request.query_params.get('param')
-        params = params.split(',') if params else []
-        countable_params = [p for p in params if p not in self.uncountable]
-
-        breakdowns = self.request.query_params.get('breakdowns')
-        breakdowns = breakdowns.split(',') if breakdowns else []
-        grouby_params = {
-            'year': 'part',
-            'part': 'year'
-        }
-        groupby = [grouby_params[_] for _ in breakdowns if _ in grouby_params.keys()]
-
-        qs = self.queryset.filter_and_aggregate(year, part, category, countable_params, groupby)
-
-        if len(breakdowns)==2:
-            qs = qs.values('part', 'name', 'year', 'parameters')
-
-        data = list(qs) if breakdowns else [qs]
-
-        def add_unaggregated_params(row):
-            if part and 'year' not in breakdowns:
-                row['part'] = ', '.join(sorted(part))
-            if year and 'part' not in breakdowns:
-                if len(year) > 1:
-                    years = [int(_) for _ in year]
-                    row['year'] = '-'.join([str(min(years)), str(max(years))])
-                else:
-                    row['year'] = year[0]
-            if len(breakdowns) != 2:
-                row.update({param: None for param in params if param in self.uncountable})
-                row.update({'name': None})
-            else:
-                row.update({param:row.get('parameters', {}).get(param) for param in params})
-                row.pop('parameters')
-            return row
-
-        data = list(map(add_unaggregated_params, data))
+        if len(breakdowns) == 0:
+            data = add_filters_to_response(request.query_params, self.get_queryset())
+            data = [data]
 
         return response.Response(data)
