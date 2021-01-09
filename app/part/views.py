@@ -73,6 +73,14 @@ class AggregatedDataView(generics.ListAPIView):
 
         if len(breakdowns) == 1:
             data = AggregatedDataSerializer(self.get_queryset(), many=True, context={'request': request}).data
+        
+        if len(breakdowns) == 0:
+            if len(year) == 1 and len(part) == 1:
+                data = AggregatedDataSerializer(self.get_queryset(), many=True, context={'request': request}).data
+            elif len(year) == 1 or len(part) == 1:
+                data = AggregatedDataSerializer(self.get_queryset(), many=True, context={'request': request}).data
+            else:
+                data = AggregatedDataSerializer(self.get_queryset(), context={'request': request}).data
 
         if len(breakdowns) == 2:
             filters = {}
@@ -84,9 +92,5 @@ class AggregatedDataView(generics.ListAPIView):
                 filters['category__in'] = category
             qs = Part.objects.filter(**filters)
             data = TablePartSerializer(qs, many=True, context={'request': request}).data
-
-        if len(breakdowns) == 0:
-            data = add_filters_to_response(request.query_params, self.get_queryset())
-            data = [data]
 
         return response.Response(data)
