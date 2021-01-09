@@ -15,6 +15,7 @@ def prepare_query_params(query_params):
 
     params = query_params.get('param')
     params = params.split(',') if params else []
+    params = [_ for _ in params if _ != 'name']
 
     breakdowns = query_params.get('breakdowns')
     breakdowns = breakdowns.split(',') if breakdowns else []
