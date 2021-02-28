@@ -1,14 +1,15 @@
 import re
-import pandas as pd
 
+import pandas as pd
+from app.constants import UNCOUNTABLE
+from rest_framework import generics, mixins, response, views, viewsets
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
-from rest_framework import viewsets, mixins, views, generics, response
 
 from .models import Part
-from .serializers import PartSerializer, AggregatedDataSerializer, TablePartSerializer
-from .utils import prepare_query_params, add_filters_to_response
-from app.constants import UNCOUNTABLE
+from .serializers import (AggregatedDataSerializer, PartSerializer,
+                          TablePartSerializer)
+from .utils import prepare_query_params
 
 
 class PartViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
@@ -73,12 +74,12 @@ class AggregatedDataView(generics.ListAPIView):
 
         if len(breakdowns) == 1:
             data = AggregatedDataSerializer(self.get_queryset(), many=True, context={'request': request}).data
-        
+
         if len(breakdowns) == 0:
             if len(year) == 1 and len(part) == 1:
                 data = AggregatedDataSerializer(self.get_queryset(), many=True, context={'request': request}).data
             elif len(year) == 1 or len(part) == 1:
-                data = AggregatedDataSerializer(self.get_queryset(), many=True, context={'request': request}).data
+                data = AggregatedDataSerializer(self.get_queryset(), context={'request': request}).data
             else:
                 data = AggregatedDataSerializer(self.get_queryset(), context={'request': request}).data
 
