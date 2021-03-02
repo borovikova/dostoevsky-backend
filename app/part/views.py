@@ -10,6 +10,7 @@ from .models import Part
 from .serializers import (AggregatedDataSerializer, PartSerializer,
                           TablePartSerializer)
 from .utils import prepare_query_params
+from app.constants import FILTERS
 
 
 class PartViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
@@ -59,39 +60,57 @@ class AggregatedDataView(generics.ListAPIView):
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
 
-    def get_queryset(self):
-        year, part, category, params, breakdowns = prepare_query_params(self.request.query_params)
-
+    def get_queryset(self, year, part, params, breakdowns):
         countable_params = [p for p in params if p not in UNCOUNTABLE]
-        groupby = breakdowns
+        groupby = breakdowns.copy()
         if 'part' in breakdowns or len(part) == 1:
             groupby.append('name')
 
-        return Part.objects.filter_and_aggregate(year, part, category, countable_params, groupby)
+        return Part.objects.filter_and_aggregate(year, part, countable_params, groupby)
+
+    def post(self, request, *args, **kwargs):
+        year, part, params, breakdowns = [request.data.get(param) for param in FILTERS]
+        if not all([year, part, params]):
+            return response.Response([])
+        data = self.prepare_data(year, part, params, breakdowns)
+        return response.Response(data)
 
     def list(self, request, *args, **kwargs):
-        year, part, category, params, breakdowns = prepare_query_params(request.query_params)
+        year, part, params, breakdowns = prepare_query_params(request.query_params)
+        if not all([year, part, params]):
+            return response.Response([])
+        data = self.prepare_data(year, part, params, breakdowns)
+        return response.Response(data)
+
+    def prepare_data(self, year, part, params, breakdowns):
+        data = []
+        context = {
+            'year': year,
+            'part': part,
+            'param': params,
+            'breakdowns': breakdowns
+        }
 
         if len(breakdowns) == 1:
-            data = AggregatedDataSerializer(self.get_queryset(), many=True, context={'request': request}).data
+            data = AggregatedDataSerializer(self.get_queryset(year, part, params, breakdowns), many=True,
+                                            context=context).data
 
-        if len(breakdowns) == 0:
+        elif len(breakdowns) == 0:
             if len(year) == 1 and len(part) == 1:
-                data = AggregatedDataSerializer(self.get_queryset(), many=True, context={'request': request}).data
+                data = AggregatedDataSerializer(self.get_queryset(year, part, params, breakdowns), many=True,
+                                                context=context).data
             elif len(part) == 1:
-                data = AggregatedDataSerializer(self.get_queryset(), many=True, context={'request': request}).data
+                data = AggregatedDataSerializer(self.get_queryset(year, part, params, breakdowns), many=True,
+                                                context=context).data
             else:
-                data = AggregatedDataSerializer(self.get_queryset(), context={'request': request}).data
+                data = AggregatedDataSerializer(self.get_queryset(year, part, params, breakdowns), context=context).data
 
-        if len(breakdowns) == 2:
+        elif len(breakdowns) == 2:
             filters = {}
             if year:
                 filters['year__in'] = year
             if part:
                 filters['part__in'] = part
-            if category:
-                filters['category__in'] = category
             qs = Part.objects.filter(**filters)
-            data = TablePartSerializer(qs, many=True, context={'request': request}).data
-
-        return response.Response(data)
+            data = TablePartSerializer(qs, many=True, context=context).data
+        return data

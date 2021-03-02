@@ -6,14 +6,12 @@ from django.db.models.fields.json import KeyTextTransform
 
 
 class AggregatedDataQuerySet(models.QuerySet):
-    def filter_and_aggregate(self, year=None, part=None, category=None, parameters=None, groupby=None):
+    def filter_and_aggregate(self, year=None, part=None, parameters=None, groupby=None):
         filters = {}
         if year:
             filters['year__in'] = year
         if part:
             filters['part__in'] = part
-        if category:
-            filters['category__in'] = category
         qs = self.filter(**filters)
 
         if parameters:

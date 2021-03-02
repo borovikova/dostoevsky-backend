@@ -9,10 +9,6 @@ def prepare_query_params(query_params):
     if part:
         part = part.split(',')
 
-    category = query_params.get('category')
-    if category:
-        category = category.split(',')
-
     params = query_params.get('param')
     params = params.split(',') if params else []
     params = [_ for _ in params if _ != 'name']
@@ -20,10 +16,9 @@ def prepare_query_params(query_params):
     breakdowns = query_params.get('breakdowns')
     breakdowns = breakdowns.split(',') if breakdowns else []
 
-    return year, part, category, params, breakdowns
+    return year, part, params, breakdowns
 
-def add_filters_to_response(query_params, ret):
-    year, part, category, params, breakdowns = prepare_query_params(query_params)
+def add_filters_to_response(year, part, params, breakdowns, ret):
     if len(breakdowns) < 2:
         if 'year' not in ret:
             uncount = {param: None for param in params if param in UNCOUNTABLE}

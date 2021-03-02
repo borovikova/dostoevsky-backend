@@ -4,7 +4,7 @@ from rest_framework import serializers
 
 from .models import Part
 from .utils import add_filters_to_response
-
+from app.constants import FILTERS
 
 class PartSerializer(serializers.ModelSerializer):
     clause = serializers.SerializerMethodField()
@@ -22,7 +22,7 @@ class PartSerializer(serializers.ModelSerializer):
 class AggregatedDataSerializer(serializers.BaseSerializer):
 
     def to_representation(self, instance):
-        ret = add_filters_to_response(self.context.get("request").query_params, instance)
+        ret = add_filters_to_response(*[self.context.get(param) for param in FILTERS], instance)
         return ret
 
 
@@ -31,8 +31,7 @@ class TablePartSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         ret = super().to_representation(instance)
 
-        params = self.context.get("request").query_params.get('param')
-        params = params.split(',') if params else []
+        params = self.context.get('param')
 
         ret.update({k: ret.get('parameters', {}).get(k) for k in ret.get('parameters', {}) if k in params})
         ret.pop('parameters', None)
