@@ -1,7 +1,7 @@
 import re
 
 import pandas as pd
-from app.constants import UNCOUNTABLE
+from app.constants import FILTERS, UNCOUNTABLE
 from rest_framework import generics, mixins, response, views, viewsets
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
@@ -10,7 +10,6 @@ from .models import Part
 from .serializers import (AggregatedDataSerializer, PartSerializer,
                           TablePartSerializer)
 from .utils import prepare_query_params
-from app.constants import FILTERS
 
 
 class PartViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
@@ -103,7 +102,8 @@ class AggregatedDataView(generics.ListAPIView):
                 data = AggregatedDataSerializer(self.get_queryset(year, part, params, breakdowns), many=True,
                                                 context=context).data
             else:
-                data = AggregatedDataSerializer(self.get_queryset(year, part, params, breakdowns), context=context).data
+                data = [AggregatedDataSerializer(self.get_queryset(
+                    year, part, params, breakdowns), context=context).data]
 
         elif len(breakdowns) == 2:
             filters = {}

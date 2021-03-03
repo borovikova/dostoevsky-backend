@@ -1,10 +1,11 @@
 import re
 
+from app.constants import FILTERS
 from rest_framework import serializers
 
 from .models import Part
 from .utils import add_filters_to_response
-from app.constants import FILTERS
+
 
 class PartSerializer(serializers.ModelSerializer):
     clause = serializers.SerializerMethodField()
