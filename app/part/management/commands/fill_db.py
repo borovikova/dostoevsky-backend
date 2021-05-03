@@ -15,6 +15,10 @@ class Command(BaseCommand):
                             type=str,
                             default=os.path.join('part', 'data', 'all.pkl'),
                             help='Path to .pickle file to parse')
+        parser.add_argument('--delete_all',
+                            type=bool,
+                            default=False,
+                            help='Delete all records')
 
     def parse_categories(self):
         df = pd.read_csv(os.path.join(
@@ -29,7 +33,8 @@ class Command(BaseCommand):
         categories = self.parse_categories()
 
         obj_to_create = []
-        Part.objects.all().delete()
+        if options['delete_all']:
+            Part.objects.all().delete()
 
         years = set(df.year.values.tolist())
         for year in years:
