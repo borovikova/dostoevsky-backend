@@ -13,7 +13,7 @@ class DataTests(TestCase):
     """Test if data were parsed correctly by fill_db command using sample data for 2019 for clause 105ч.1"""
 
     def test_data_parsing(self):
-        call_command('fill_db', os.path.join(settings.BASE_DIR, 'part', 'tests', 'test_files', 'test_data.pkl'))
+        call_command('fill_db', file=os.path.join(settings.BASE_DIR, 'part', 'tests', 'test_files', 'test_data.pkl'))
         parts = Part.objects.all()
         self.assertEqual(len(parts), 1)
         part = parts[0]

@@ -10,7 +10,7 @@ from part.models import Part
 from part.serializers import PartSerializer
 
 
-TAGS_URL = reverse('part:data')
+TAGS_URL = reverse('part:data-list')
 
 
 class PublicPartsApiTests(TestCase):
