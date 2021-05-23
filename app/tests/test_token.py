@@ -1,9 +1,9 @@
-from django.test import TestCase
+import pytest
 from django.contrib.auth import get_user_model
+from django.test import TestCase
 from django.urls import reverse
-
-from rest_framework.test import APIClient
 from rest_framework import status
+from rest_framework.test import APIClient
 
 TOKEN_URL = reverse('token')
 
@@ -11,7 +11,7 @@ TOKEN_URL = reverse('token')
 def create_user(**params):
     return get_user_model().objects.create_user(**params)
 
-
+@pytest.mark.django_db
 class ApiTests(TestCase):
     """Test the API"""
 
