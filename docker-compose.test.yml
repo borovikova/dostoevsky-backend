@@ -1,29 +1,9 @@
 version: '3.7'
 
 services:
-  web:
-    build:
-      context: ./app
-    restart: on-failure
-    command: gunicorn app.wsgi:application --bind 0.0.0.0:8000
-    volumes:
-      - static_volume:/home/app/web/app/static
-    environment:
-      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
-      - ALLOWED_HOSTS=${ALLOWED_HOSTS}
-      - DJANGO_DEBUG=${DJANGO_DEBUG}
-      - POSTGRES_DB=app
-      - POSTGRES_USER=${DB_USER}
-      - POSTGRES_PASSWORD=${DB_PASS}
-#    env_file:
-#      - ./.env
-    depends_on:
-      - db
   db:
     image: postgres:12.0
     restart: always
-    volumes:
-      - postgres_data:/var/lib/postgresql/data/
     environment:
       - POSTGRES_DB=app
       - POSTGRES_USER=${DB_USER}
@@ -37,8 +17,3 @@ services:
       - POSTGRES_PASSWORD=${DB_PASS}
     depends_on:
       - db
-    command: pytest --ds=app.settings
-
-volumes:
-  postgres_data:
-  static_volume:

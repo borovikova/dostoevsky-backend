@@ -5,10 +5,9 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
 
-TAGS_URL = reverse('part:data-list')
+URL = reverse('part:data-list')
 
 
-@pytest.mark.django_db
 class PublicPartsApiTests(TestCase):
 	"""Test the publicly available API"""
 
@@ -17,6 +16,7 @@ class PublicPartsApiTests(TestCase):
 
 	def test_login_required(self):
 		"""Test that login is required for retrieving parts"""
-		res = self.client.get(TAGS_URL)
+		res = self.client.get(URL)
 
 		self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
+

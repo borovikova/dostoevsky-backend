@@ -6,7 +6,7 @@ from part import views
 app_name = 'part'
 
 urlpatterns = [
-    url(r'aggregated_data', views.AggregatedDataView.as_view()),
+    url(r'aggregated_data', views.AggregatedDataView.as_view(), name='aggregated_data'),
 ]
 
 router = DefaultRouter()

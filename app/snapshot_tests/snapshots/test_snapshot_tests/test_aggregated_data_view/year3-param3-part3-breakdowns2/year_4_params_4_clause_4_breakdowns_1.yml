@@ -1,0 +1,24 @@
+- addFineSum: null
+  corruption: null
+  part: "105\u0447.1, 118, 196, 322.3"
+  primaryForcedLabour: null
+  totalConvicted: 10747
+  year: 2009
+- addFineSum: null
+  corruption: 6
+  part: "105\u0447.1, 118, 196, 322.3"
+  primaryForcedLabour: null
+  totalConvicted: 7603
+  year: 2012
+- addFineSum: 975000
+  corruption: null
+  part: "105\u0447.1, 118, 196, 322.3"
+  primaryForcedLabour: 10
+  totalConvicted: 14692
+  year: 2019
+- addFineSum: null
+  corruption: null
+  part: "105\u0447.1, 118, 196, 322.3"
+  primaryForcedLabour: 9
+  totalConvicted: 10595
+  year: 2020

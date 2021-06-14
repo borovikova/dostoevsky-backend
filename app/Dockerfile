@@ -8,7 +8,7 @@ ENV PYTHONUNBUFFERED 1
 # install dependencies
 RUN apt-get update && \
     apt-get upgrade -y && \
-    apt-get install -y netcat-openbsd gcc && \
+    apt-get install -y netcat-openbsd gcc curl make && \
     apt-get clean
 
 # install dependencies
