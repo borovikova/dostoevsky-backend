@@ -1,0 +1,19 @@
+version: '3.7'
+
+services:
+  db:
+    image: postgres:12.0
+    restart: always
+    environment:
+      - POSTGRES_DB=test
+      - POSTGRES_USER=test_user
+      - POSTGRES_PASSWORD=test_password
+  pytest:
+    build:
+      context: ./app
+    environment:
+      - POSTGRES_DB=test
+      - POSTGRES_USER=test_user
+      - POSTGRES_PASSWORD=test_password
+    depends_on:
+      - db

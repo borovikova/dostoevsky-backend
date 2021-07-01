@@ -50,4 +50,4 @@ class Command(BaseCommand):
                 obj_to_create.append(
                     Part(year=year, part=part, name=name, parameters=params, category=category))
 
-        Part.objects.bulk_create(obj_to_create)
+        Part.objects.bulk_create(obj_to_create, batch_size=100)
