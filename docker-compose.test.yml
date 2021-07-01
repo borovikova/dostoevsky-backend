@@ -5,15 +5,11 @@ services:
     image: postgres:12.0
     restart: always
     environment:
-      - POSTGRES_DB=app
-      - POSTGRES_USER=${DB_USER}
-      - POSTGRES_PASSWORD=${DB_PASS}
+      - POSTGRES_DB=test
+      - POSTGRES_USER=test_user
+      - POSTGRES_PASSWORD=test_password
   pytest:
     build:
       context: ./app
-    environment:
-      - POSTGRES_DB=app
-      - POSTGRES_USER=${DB_USER}
-      - POSTGRES_PASSWORD=${DB_PASS}
     depends_on:
       - db
