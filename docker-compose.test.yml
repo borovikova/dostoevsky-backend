@@ -11,5 +11,7 @@ services:
   pytest:
     build:
       context: ./app
+    environment:
+      - TESTING="true"
     depends_on:
       - db
