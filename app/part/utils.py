@@ -27,19 +27,15 @@ def prepare_query_params(query_params):
 
 def add_filters_to_response(year, part, params, breakdowns, ret):
 	if len(breakdowns) < 2:
+		uncount = {param: None for param in params if param in UNCOUNTABLE}
+		ret.update(uncount)
 		if 'year' not in ret:
-			uncount = {param: None for param in params if param in UNCOUNTABLE}
-			if uncount:
-				ret.update(uncount)
 			if len(year) > 1:
 				years = [int(_) for _ in year]
 				ret['year'] = '-'.join([str(min(years)), str(max(years))])
 			else:
 				ret['year'] = str(year[0])
 		if 'part' not in ret:
-			uncount = {param: None for param in params if param in UNCOUNTABLE}
-			if uncount:
-				ret.update(uncount)
 			ret['part'] = ', '.join(sorted(part)) if len(part) > 1 else part[0]
 	return ret
 
