@@ -1,7 +1,7 @@
 version: '3.7'
 
 services:
-  db:
+  test_db:
     image: postgres:12.0
     restart: always
     environment:
@@ -12,8 +12,9 @@ services:
     build:
       context: ./app
     environment:
+      - DB_HOST=test_db
       - POSTGRES_DB=test
       - POSTGRES_USER=test_user
       - POSTGRES_PASSWORD=test_password
     depends_on:
-      - db
+      - test_db

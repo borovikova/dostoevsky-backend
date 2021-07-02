@@ -11,9 +11,10 @@ TOKEN_URL = reverse('token')
 def create_user(**params):
     return get_user_model().objects.create_user(**params)
 
+
 @pytest.mark.django_db
-class ApiTests(TestCase):
-    """Test the API"""
+class AuthorizationTests(TestCase):
+    """Test the authorization"""
 
     def setUp(self):
         self.client = APIClient()
@@ -49,3 +50,8 @@ class ApiTests(TestCase):
         res = self.client.post(TOKEN_URL, {'username': 'one', 'password': ''})
         self.assertNotIn('token', res.data)
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_login_required(self):
+        """Test that login is required for retrieving data"""
+        res = self.client.get(reverse('part:data-list'))
+        self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)

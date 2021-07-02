@@ -7,7 +7,7 @@ from .models import Part
 from .serializers import (AggregatedDataSerializer,
                           PartSerializer,
                           TablePartSerializer)
-from .utils import prepare_query_params, get_all_filters
+from .utils import prepare_query_params, get_all_filters, add_filters_to_response
 
 
 class PartViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
@@ -67,6 +67,8 @@ class AggregatedDataView(generics.ListAPIView):
 		if len(breakdowns) == 1:
 			data = AggregatedDataSerializer(self.get_queryset(year, part, params, breakdowns), many=True,
 			                                context=context).data
+			if not data:
+				data = [add_filters_to_response(year, part, params, breakdowns, {})]
 
 		elif len(breakdowns) == 0:
 			if len(year) == 1 and len(part) == 1:
@@ -76,8 +78,10 @@ class AggregatedDataView(generics.ListAPIView):
 				data = AggregatedDataSerializer(self.get_queryset(year, part, params, breakdowns), many=True,
 				                                context=context).data
 			else:
-				data = [AggregatedDataSerializer(self.get_queryset(
-					year, part, params, breakdowns), context=context).data]
+				data = AggregatedDataSerializer(self.get_queryset(
+					year, part, params, breakdowns), context=context).data or {}
+				data = [add_filters_to_response(year, part, params, breakdowns, data)]
+
 
 		elif len(breakdowns) == 2:
 			filters = {}
@@ -87,5 +91,6 @@ class AggregatedDataView(generics.ListAPIView):
 				filters['part__in'] = part
 			qs = Part.objects.filter(**filters)
 			data = TablePartSerializer(qs, many=True, context=context).data
+
 		data = sorted(data, key=lambda item: (item["year"], item["part"]))
 		return data

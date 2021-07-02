@@ -22,8 +22,8 @@ class PartSerializer(serializers.ModelSerializer):
 
 class AggregatedDataSerializer(serializers.BaseSerializer):
 
-    def to_representation(self, instance):
-        ret = add_filters_to_response(*[self.context.get(param) for param in FILTERS], instance)
+    def to_representation(self, ret: dict) -> dict:
+        ret = add_filters_to_response(*[self.context.get(param) for param in FILTERS], ret)
         return ret
 
 
