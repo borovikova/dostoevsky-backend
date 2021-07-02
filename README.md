@@ -48,33 +48,3 @@ docker-compose exec web python manage.py fill_db
     }
 ]
 ```
-
-# TODO move to issues
-```
-{
-    "year": [
-        2019,
-        2009
-    ],
-    "param": [
-        "addDismissalOtherPersons",
-        "addDismissalOffences"
-    ],
-    "part": [
-        "105ч.1",
-        "105ч.2"
-    ],
-    "breakdowns": [
-    ]
-}
-```
-```
-[
-    {
-        "addDismissalOtherPersons": null,
-        "addDismissalOffences": null,
-        "year": "2009-2019", <-- should be comma, not a dash
-        "part": "105ч.1, 105ч.2"
-    }
-]
-```
