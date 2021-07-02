@@ -18,9 +18,6 @@ fill_db:
 	docker-compose -f docker-compose.dev.yml exec web python manage.py fill_db
 	docker-compose -f docker-compose.dev.yml exec web python manage.py fill_db --file='part/data/2020.pkl'
 
-update_snapshots:
-	docker-compose -f docker-compose.test.yml build && docker-compose -f docker-compose.test.yml run pytest pytest --snapshot-update --ds=app.settings
-
 copy_snapshots:
 	docker cp dostoevsky-backend_web_1:/home/app/web/snapshot_tests/snapshots ~/dostoevsky-backend/app/snapshot_tests/snapshots
 
