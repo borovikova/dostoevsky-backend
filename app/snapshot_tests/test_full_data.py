@@ -86,21 +86,12 @@ def test_full_aggregated_data(snapshot, breakdowns):
 
 @pytest.mark.snapshot
 @pytest.mark.django_db
+@pytest.mark.parametrize("year", [[2009, 2019], [2009]])
+@pytest.mark.parametrize("part", [["105ч.1", "105ч.2"], ["105ч.1"]])
 @pytest.mark.parametrize("breakdowns", [[], ['part'], ['year']])
-def test_aggregated_uncountables_return_null(snapshot, breakdowns):
-    year = [2019, 2009]
+def test_aggregated_uncountables_return_null(snapshot, breakdowns, year, part):
     param = ["addDismissalOtherPersons", "addDismissalOffences"]
-    part = ["105ч.1", "105ч.2"]
-    expected_result = json.loads("""
-    [
-        {
-            "addDismissalOtherPersons": null,
-            "addDismissalOffences": null,
-            "year": "2009-2019",
-            "part": "105ч.1, 105ч.2"
-        }
-    ]
-    """)
-
     res = request_with_test_client(year, param, part, breakdowns)
-    assert res.json() == expected_result
+    assert res.json() != []
+    snapshot.assert_match(yaml.dump(json.loads(res.content)),
+                          f'year_{len(year)}_params_{len(param)}_clause_{len(part)}_breakdowns_{len(breakdowns)}.yml')
