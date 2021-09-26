@@ -1,25 +1,39 @@
-
 import model
 
 
-def test_parameters_mapper_can_load_lines(session):
+def test_parts_mapper_can_insert_rows(session):
     session.execute(
-        "INSERT INTO parameters (name, part, parameter, value, year, category) VALUES "
-        '("Убийство", "105ч.1", "totalConvicted", 10719, "2009", "Тяжкие"),'
-        '("Убийство", "105ч.1", "totalConvicted", 10000, "2010", "")'
+        "INSERT INTO parts (name, part, year, category, totalConvicted, primaryLifeSentence) VALUES "
+        '("Убийство", "105ч.1", "2009", "Тяжкие", 10000, 0)'
     )
     expected = [
-        model.Parameter("Убийство", "105ч.1", "totalConvicted", 10719, "2009", "Тяжкие"),
-        model.Parameter("Убийство", "105ч.1", "totalConvicted", 10000, "2010")
+        model.Part(
+            name="Убийство",
+            part="105ч.1",
+            year="2009",
+            category="Тяжкие",
+            totalConvicted=10000,
+            primaryLifeSentence=0,
+        )
     ]
-    assert session.query(model.Parameter).all() == expected
+    assert session.query(model.Part).all() == expected
 
 
-
-def test_parameters_mapper_can_save_lines(session):
-    new_line = model.Parameter("Убийство", "105ч.1", "totalConvicted", 5000, "2011", "Тяжкие")
-    session.add(new_line)
+def test_parts_mapper_can_select_rows(session):
+    new_row = model.Part(
+        name="Убийство",
+        part="105ч.1",
+        year="2009",
+        category="Тяжкие",
+        totalConvicted=10000,
+        primaryLifeSentence=0,
+    )
+    session.add(new_row)
     session.commit()
 
-    rows = list(session.execute('SELECT name, part, parameter, value, year, category FROM "parameters"'))
-    assert rows == [("Убийство", "105ч.1", "totalConvicted", 5000, "2011", "Тяжкие")]
+    rows = list(
+        session.execute(
+            'SELECT name, part, year, category, totalConvicted, primaryLifeSentence FROM "parts"'
+        )
+    )
+    assert rows == [("Убийство", "105ч.1", "2009", "Тяжкие", 10000, 0)]
