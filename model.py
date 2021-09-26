@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 
+
 @dataclass(unsafe_hash=True)
 class Parameter:
     name: str
@@ -11,11 +12,8 @@ class Parameter:
 
 
 # class Aggregate:
-    
+
 # def group_by_year():
-
-
-    
 
 
 # class Part:
@@ -30,7 +28,7 @@ class Parameter:
 #     parameters: list
 
 
-# статья 
+# статья
 # часть
 # параметр
 # значение
