@@ -12,7 +12,7 @@ docker-compose exec web python manage.py fill_db
 
 Получить токен для доступа к api:
 
-отправить на `http://localhost:8000/token/` `POST`-запрос вида 
+отправить на `http://localhost:8000/token/` `POST`-запрос вида
 
 ```
 {
