@@ -1,7 +1,7 @@
 from sqlalchemy import Table, MetaData, Column, Integer, String
 from sqlalchemy.orm import mapper
 
-import model
+from dostoevsky import model
 
 # TODO: CHange "noCrimeSelf-defence" to "noCrimeSelfdefence" in https://github.com/goooseman/dostoevsky-website/blob/develop/content/metri%D1%81s.json
 
@@ -14,7 +14,7 @@ parts = Table(
     Column("name", String(255), nullable=False),
     Column("part", String(20), nullable=False),
     Column("year", String(4), nullable=False),
-    Column("category", String(255), default="", server_default="", nullable=True),
+    Column("category", String(255), default="", server_default="", nullable=False),
     Column("totalConvicted", Integer, nullable=True),
     Column("primaryLifeSentence", Integer, nullable=True),
     Column("primaryImprisonment", Integer, nullable=True),

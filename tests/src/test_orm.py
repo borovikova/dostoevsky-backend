@@ -1,10 +1,13 @@
-import model
+import pytest
+
+from dostoevsky import model
+
+pytestmark = pytest.mark.usefixtures("mappers")
 
 
 def test_parts_mapper_can_insert_rows(session):
     session.execute(
-        "INSERT INTO parts (name, part, year, category, totalConvicted, primaryLifeSentence) VALUES "
-        '("Убийство", "105ч.1", "2009", "Тяжкие", 10000, 0)'
+        "INSERT INTO parts (name, part, year, category,\"totalConvicted\", \"primaryLifeSentence\") VALUES ('Убийство', '105ч.1', '2009', 'Тяжкие', 10000, 0);"
     )
     expected = [
         model.Part(
@@ -33,7 +36,7 @@ def test_parts_mapper_can_select_rows(session):
 
     rows = list(
         session.execute(
-            'SELECT name, part, year, category, totalConvicted, primaryLifeSentence FROM "parts"'
+            'SELECT name, part, year, category, "totalConvicted", "primaryLifeSentence" FROM "parts"'
         )
     )
     assert rows == [("Убийство", "105ч.1", "2009", "Тяжкие", 10000, 0)]
