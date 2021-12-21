@@ -1,5 +1,7 @@
 from dataclasses import dataclass
 
+# TODO: change all names into snake_case, convert to camel_case in serialiazer
+
 
 @dataclass
 class Part:
