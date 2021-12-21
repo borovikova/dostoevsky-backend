@@ -3,6 +3,8 @@ import pytest
 from dostoevsky import model
 from dostoevsky.repository import SqlAlchemyRepository
 
+pytestmark = pytest.mark.usefixtures("mappers")
+
 
 @pytest.fixture
 def test_rows(session):

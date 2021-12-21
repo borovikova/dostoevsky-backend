@@ -1,11 +1,12 @@
 from sqlalchemy import Table, MetaData, Column, Integer, String
-from sqlalchemy.orm import mapper
+from sqlalchemy.orm import registry
 
 from dostoevsky import model
 
 # TODO: CHange "noCrimeSelf-defence" to "noCrimeSelfdefence" in https://github.com/goooseman/dostoevsky-website/blob/develop/content/metri%D1%81s.json
 
-metadata = MetaData()
+mapper_registry = registry()
+metadata = mapper_registry.metadata
 
 parts = Table(
     "parts",
@@ -105,4 +106,5 @@ parts = Table(
 
 
 def start_mappers():
-    parameters_mapper = mapper(model.Part, parts)
+    print("Starting mappers")
+    parameters_mapper = mapper_registry.map_imperatively(model.Part, parts)
