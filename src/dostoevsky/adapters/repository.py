@@ -2,8 +2,8 @@ from typing import Dict, List
 from sqlalchemy.orm import load_only, Query
 from sqlalchemy import insert, func
 
-from dostoevsky.orm import parts
-from dostoevsky.model import Part
+from dostoevsky.adapters.orm import parts
+from dostoevsky.domain.model import Part
 
 
 def filter_query(q: Query, filters: Dict[str, list]):

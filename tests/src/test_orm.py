@@ -1,6 +1,6 @@
 import pytest
 
-from dostoevsky import model
+from dostoevsky.domain import model
 
 pytestmark = pytest.mark.usefixtures("mappers")
 

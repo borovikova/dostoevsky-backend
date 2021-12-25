@@ -1,22 +1,9 @@
 import pytest
 
-from dostoevsky import model
-from dostoevsky.repository import SqlAlchemyRepository
+from dostoevsky.domain import model
+from dostoevsky.adapters.repository import SqlAlchemyRepository
 
 pytestmark = pytest.mark.usefixtures("mappers")
-
-
-@pytest.fixture
-def test_rows(session):
-    session.execute(
-        'INSERT INTO parts (name, part, year, "totalConvicted", "primaryLifeSentence") VALUES '
-        "('Убийство', '105ч.1', '2010',  10056, 3),"
-        "('Убийство с отягчающими', '105ч.2', '2010',  6001, 0),"
-        "('Убийство матерью', '106', '2010',  5368, 1),"
-        "('Убийство', '105ч.1', '2011',  4579, 0),"
-        "('Убийство с отягчающими', '105ч.2', '2011',  8932, 4),"
-        "('Убийство матерью', '106', '2011',  10689, 1)"
-    )
 
 
 def test_repository_can_save_a_parameter(session):

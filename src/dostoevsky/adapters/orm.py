@@ -1,7 +1,7 @@
 from sqlalchemy import Table, MetaData, Column, Integer, String
 from sqlalchemy.orm import registry
 
-from dostoevsky import model
+from dostoevsky.domain import model
 
 # TODO: CHange "noCrimeSelf-defence" to "noCrimeSelfdefence" in https://github.com/goooseman/dostoevsky-website/blob/develop/content/metri%D1%81s.json
 
